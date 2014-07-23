@@ -1,3 +1,6 @@
+#ifndef __ROBOIME_CONFIG_H
+#define __ROBOIME_CONFIG_H
+
 #include <vector>
 #include <boost/property_tree/ptree.hpp>
 
@@ -16,3 +19,4 @@ namespace roboime
             std::string get(const std::string& key_sequence) const;
     };
 }
+#endif

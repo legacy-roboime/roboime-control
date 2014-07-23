@@ -1,6 +1,8 @@
+#ifndef __ROBOIME_ZMQ_WORKER_H
+#define __ROBOIME_ZMQ_WORKER_H
+
 #include <zmq.hpp>
 #include <boost/thread.hpp>
-#include <memory>
 
 #include "config.h"
 
@@ -24,3 +26,4 @@ namespace roboime
             ~zmq_worker();
     };
 }
+#endif

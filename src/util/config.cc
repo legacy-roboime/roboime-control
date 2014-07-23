@@ -34,4 +34,3 @@ namespace roboime
         return ret;
     }
 }
-

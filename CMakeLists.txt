@@ -9,16 +9,11 @@ set(comm communication)
 set(model model)
 set(util util)
 
-# ZMQ interface with the restful API
 project(${exec} C CXX)
-# FIX server/clients, wrappers and stuff
 project(${core} C CXX)
-# Risk clients for various applications
-# Random stuff, config file reading, etc
 project(${comm} C CXX)
 project(${model} C CXX)
 project(${util} C CXX)
-# Main exe
 
 if(WIN32)
     # Define minimum Windows version for headers 0x501 = Vista IIRC
@@ -44,11 +39,10 @@ set(Zmq_LIBRARY_RELEASE "" CACHE FILEPATH "ZeroMQ 3 library")
 set(Zmq_LIBRARY_DEBUG "" CACHE FILEPATH "ZeroMQ 3 library")
 set(Zmq_LIBRARY optimized ${Zmq_LIBRARY_RELEASE} debug ${Zmq_LIBRARY_DEBUG})
 
-if(WIN32)
-    set(Zmq_DLL_DEBUG "" CACHE FILEPATH "Zmq dll (for copying)")
-    set(Zmq_DLL_RELEASE "" CACHE FILEPATH "Zmq dll (for copying)")
-    set(Zmq_DLL optimized ${Zmq_DLL_RELEASE} debug ${Zmq_DLL_DEBUG})
-endif()
+set(Usb_INCLUDE_DIRS "" CACHE PATH "libusb include directories")
+set(Usb_LIBRARY_RELEASE "" CACHE FILEPATH "libusb library")
+set(Usb_LIBRARY_DEBUG "" CACHE FILEPATH "libusb library")
+set(Usb_LIBRARY optimized ${Usb_LIBRARY_RELEASE} debug ${Usb_LIBRARY_DEBUG})
 
 find_package(Boost 1.47.0 COMPONENTS date_time filesystem system thread regex) 
 
@@ -56,6 +50,7 @@ if(Boost_FOUND)
     include_directories(
         ${Boost_INCLUDE_DIRS} 
         ${Zmq_INCLUDE_DIRS} 
+        ${Usb_INCLUDE_DIRS} 
         "${src}/${util}" 
         "${src}/${exec}" 
         "${src}/${comm}" 
@@ -78,10 +73,12 @@ if(Boost_FOUND)
 
     set(Comm_SOURCES
         ${src}/${comm}/zmq_worker.h
+        ${src}/${comm}/usb_worker.h
     )
 
     set(Comm_HEADERS 
         ${src}/${comm}/zmq_worker.cc
+        ${src}/${comm}/usb_worker.cc
     )
 
     set(Model_SOURCES
@@ -106,11 +103,11 @@ if(Boost_FOUND)
     add_library(${util} ${Util_SOURCES} ${Util_HEADERS}) 
     add_executable(${exec} ${Exec_SOURCES} ${Exec_HEADERS}) 
 
-    target_link_libraries(${model} ${util} ${Boost_LIBRARIES})
-    target_link_libraries(${comm} ${util} ${model} ${Boost_LIBRARIES} ${Zmq_LIBRARY})
-    target_link_libraries(${util} ${Boost_LIBRARIES})
-    target_link_libraries(${core} ${comm} ${model} ${util} ${Boost_LIBRARIES} ${Zmq_LIBRARY})
-    target_link_libraries(${exec} ${core} ${comm} ${model} ${util} ${Boost_LIBRARIES} ${Zmq_LIBRARY})
+    target_link_libraries(${model} ${util} ${Boost_LIBRARIES} ${Usb_LIBRARY})
+    target_link_libraries(${comm} ${util} ${model} ${Boost_LIBRARIES} ${Zmq_LIBRARY}  ${Usb_LIBRARY})
+    target_link_libraries(${util} ${Boost_LIBRARIES} ${Usb_LIBRARY})
+    target_link_libraries(${core} ${comm} ${model} ${util} ${Boost_LIBRARIES} ${Zmq_LIBRARY} ${Usb_LIBRARY})
+    target_link_libraries(${exec} ${core} ${comm} ${model} ${util} ${Boost_LIBRARIES} ${Zmq_LIBRARY} ${Usb_LIBRARY})
 else()
     message( SEND_ERROR "Boost is required!" )
 endif()
