@@ -34,7 +34,7 @@ namespace roboime
             usb_worker(const config& conf);
             ~usb_worker();
 
-            void async_process_action(std::vector<std::shared_ptr<action>> command);
+            void async_process_action(const std::vector<std::shared_ptr<action>>& command);
             void send_raw_data(char* command, size_t count);
     };
 }

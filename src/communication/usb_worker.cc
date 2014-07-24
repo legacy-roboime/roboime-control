@@ -12,7 +12,8 @@ namespace roboime
         boost::call_once(flag, &usb_init);
     }
 
-    void* usb_worker::get_device(uint16_t id_vendor, uint16_t id_product)
+    void* 
+    usb_worker::get_device(uint16_t id_vendor, uint16_t id_product)
     {
     	usb_bus* bus_list, *bus;
     	usb_find_busses();
@@ -50,8 +51,7 @@ namespace roboime
     {
         initialize_usb_once();
         handle = get_device(5824, 1500);
-        std::cout << "Acquired transmitter handle " << std::endl;
-        // control_msg(usb_dev_handle *dev, int requesttype, int request, int value, int index, char *bytes, int size, int timeout
+        std::cout << "Acquired transmitter USB handle." << std::endl;
     }
 
     usb_worker::~usb_worker()
@@ -59,28 +59,31 @@ namespace roboime
         usb_reset(static_cast<usb_dev_handle*>(handle));
     }
 
-    void usb_worker::async_process_action(std::vector<std::shared_ptr<action>> command)
+    void usb_worker::async_process_action(const std::vector<std::shared_ptr<action>>& command)
     {
-        service.post(
-            [this, &command] () {
-                char full_packet[47];
-                memset(full_packet, 255, 47); 
-                full_packet[0] = 254;
-                full_packet[1] = 0;
-                full_packet[2] = 44;
+        //service.post(
+        [this, &command] () {
+            char full_packet[46];
+            memset(full_packet, 255, 47); 
+            full_packet[0] = 254;
+            full_packet[1] = 0;
+            full_packet[2] = 44;
 
-                for (int i = 0, end_i = command.size(); i < end_i; ++i)
-                {
-                    auto raw_command = command[i].get();
-                    std::vector<char> buffer = raw_command->as_buffer();
-                    memcpy(&full_packet[0] + 3 + 7 * i, buffer.data(), 7);
-                }
-                full_packet[46] = 55;
-
-                auto internal_handle = static_cast<usb_dev_handle*>(handle); 
-                usb_control_msg(internal_handle, 5696, 3, 0, 0, full_packet, 47, 200);
+            for (int i = 0, end_i = command.size(); i < end_i && i < 6; ++i)
+            {
+                auto raw_command = command[i].get();
+                std::vector<char> buffer = raw_command->as_buffer();
+                memcpy(&full_packet[0] + 3 + 7 * i, buffer.data(), 7);
             }
-        );
+            full_packet[45] = 55;
+
+            auto internal_handle = static_cast<usb_dev_handle*>(handle); 
+            for (int i = 0; i < sizeof(full_packet) / sizeof(full_packet[0]); ++i) 
+                std::cout << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) (unsigned char) full_packet[i] << " ";
+            std::cout << std::endl;
+            usb_control_msg(internal_handle, 5696, 3, 0, 0, full_packet, 46, 500);
+        }();
+       // );
     }
 
     void usb_worker::send_raw_data(char* command, size_t count)

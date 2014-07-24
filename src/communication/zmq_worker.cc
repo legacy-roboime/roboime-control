@@ -29,8 +29,8 @@ namespace roboime
         {
             recv_sock.setsockopt(ZMQ_IDENTITY, "roboime-control", 15);
             recv_sock.setsockopt(ZMQ_SUBSCRIBE, "", 0);
-            recv_sock.connect(conf.get("zmq_subscriber_addr").c_str());
-            std::cout << "Connected on socket " << conf.get("zmq_subscriber_addr") << std::endl;
+            recv_sock.connect(conf.get<std::string>("zmq_subscriber_addr").c_str());
+            std::cout << "Connected on socket " << conf.get<std::string>("zmq_subscriber_addr") << std::endl;
         }
         catch (std::exception& e)
         {
@@ -64,7 +64,7 @@ namespace roboime
                 // I have no frickin idea how to recover from ZMQ errors. 
                 // Close the socket, rebind and hope it goes away (while logging).
                 recv_sock.close();
-                recv_sock.connect(conf.get("zmq_subscriber_addr").c_str());
+                recv_sock.connect(conf.get<std::string>("zmq_subscriber_addr").c_str());
                 std::cout << __FUNCTION__ << " [ERROR] " << e.what() << std::endl;
             }
         }

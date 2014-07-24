@@ -1,78 +1,13 @@
+#include <boost/property_tree/json_parser.hpp>
 #include <cmath>
 #include <functional>
 #include <algorithm>
 
 #include "world.h"
+#include "config.h"
 
 namespace roboime
 {
-    point::point() :
-        x(0), y(0)
-    {}
-
-    point::point(float x, float y) :
-        x(x), y(y)
-    {}
-
-    robot::robot(int id, float x, float y, float o) :
-        position(x, y),
-        angle(o),
-        id(id),
-        radius(0.0750),
-        wheel_radius(0.0289),
-        max_speed(54),
-        angles{60. * M_PI / 180., 135. * M_PI / 180., -135. * M_PI / 180., -60. * M_PI / 180.}
-    {}
-
-    char 
-    move_action::to_byte(float x)
-    {
-        if (abs(x) > r.max_speed)
-            x = x / abs(x);
-        else
-            x = x / r.max_speed;
-
-        return (char) (127 * x);
-    }
-
-    char 
-    move_action::to_byte_kick(float x)
-    {
-        if (abs(x) > r.max_speed)
-            x = 1;
-        return (char) (127 * x);
-    }
-
-    std::vector<char>
-    move_action::as_buffer()
-    {
-        if (std::isnan(vx) || std::isnan(vy) || std::isnan(va))
-        {
-            return std::vector<char>{(char) r.id, 0, 0, 0, 0, 0, 0};
-        }
-        
-        std::vector<float> speeds = {
-            (vy * cosf(r.angles[0]) - vx * sinf(r.angles[0]) + va * r.radius) / r.wheel_radius,
-            (vy * cosf(r.angles[1]) - vx * sinf(r.angles[1]) + va * r.radius) / r.wheel_radius,
-            (vy * cosf(r.angles[2]) - vx * sinf(r.angles[2]) + va * r.radius) / r.wheel_radius,
-            (vy * cosf(r.angles[3]) - vx * sinf(r.angles[3]) + va * r.radius) / r.wheel_radius
-        };
-        auto largest = *std::max_element(speeds.begin(), speeds.end(), [](float x, float y) { return std::abs(x) < std::abs(y); });
-        if (largest > r.max_speed && largest != 0)
-            for (auto it = speeds.begin(), end_it = speeds.end(); it < end_it; ++it)
-                *it = *it * r.max_speed / largest;
-
-        return std::vector<char> {
-            (char) r.id, 
-            to_byte(speeds[0]), 
-            to_byte(speeds[1]), 
-            to_byte(speeds[2]), 
-            to_byte(speeds[3]),
-            to_byte(dribble? 255 : 0),
-            to_byte(is_chip? to_byte_kick(kick) : to_byte_kick(-kick))
-        };
-    }
-
     world::world() :
         width(4.),
         length(6.),
@@ -102,7 +37,7 @@ namespace roboime
             defense_stretch = packet.get<float>("geometry.defense_stretch");
             goal_width = packet.get<float>("geometry.goal_width");
         }
-        catch (std::exception& e) { }
+        catch (std::exception& e) {}
         
         try
         {
@@ -112,7 +47,11 @@ namespace roboime
                 ball.x = it->second.get<float>("x");
                 ball.y = it->second.get<float>("y");
             }
+        }
+        catch(std::exception& e) {}
 
+        try
+        {
             auto yellows = packet.get_child("detection.robots_yellow");
             team_yellow.clear();
             for (auto it = yellows.begin(), endIt = yellows.end(); it != endIt; ++it)
@@ -141,5 +80,102 @@ namespace roboime
             }
         }
         catch (std::exception& e) {} 
+
+        try
+        {
+            auto yellows = packet.get_child("control.actions_yellow");
+            //boost::property_tree::json_parser::write_json(std::cout, yellows);
+            if (yellows.begin() != yellows.end())
+            {
+                actions_yellow.clear();            
+                for (auto it = yellows.begin(), endIt = yellows.end(); it != endIt; ++it)
+                {
+                    auto r_id = it->second.get<int>("uid");
+                    auto r_it = std::find_if(team_yellow.begin(), team_yellow.end(), [&r_id](const robot& r) { return r.id == r_id; });
+                    
+                    if (r_it != team_yellow.end())
+                    {
+                        auto r = *r_it;
+                        if (it->second.get<std::string>("type") == "move")
+                        {
+                            actions_yellow.push_back(
+                                std::make_shared<move_action>(
+                                    r,
+                                    it->second.get<float>("speeds.vx"),
+                                    it->second.get<float>("speeds.vy"),
+                                    it->second.get<float>("speeds.va"),
+                                    std::max(it->second.get<float>("kick"), it->second.get<float>("chip")),
+                                    it->second.get<float>("chip") > 0,
+                                    it->second.get<float>("dribble") > 0
+                                )
+                            );
+                        }
+                    }
+                }
+            }
+        }
+        catch (std::exception& e) 
+        {
+            //ERROR(e);
+            for (auto action : actions_yellow)
+            {
+                auto r_id = action.get()->r.id;
+                auto r_it = std::find_if(team_yellow.begin(), team_yellow.end(), [&r_id](const robot& r) { return r.id == r_id; });
+                if (r_it != team_yellow.end())
+                {
+                    auto r = *r_it;
+                    action->update_robot(r);
+                }
+            }
+            //std::cout << actions_yellow.size() << std::endl;
+        } 
+             
+         try
+         {
+             auto blues = packet.get_child("control.actions_blue");
+             if (blues.begin() != blues.end())
+             {
+                 actions_blue.clear();            
+                 for (auto it = blues.begin(), endIt = blues.end(); it != endIt; ++it)
+                 {
+                     auto r_id = it->second.get<int>("uid");
+                     auto r_it = std::find_if(team_blue.begin(), team_blue.end(), [&r_id](const robot& r) { return r.id == r_id; });
+                     if (r_it != team_blue.end()) 
+                     {
+                         auto r = *r_it;
+                         if (it->second.get<std::string>("type") == "move")
+                         {
+                             actions_blue.push_back(
+                                 std::make_shared<move_action>(
+                                     r,
+                                     it->second.get<float>("speeds.vx"),
+                                     it->second.get<float>("speeds.vy"),
+                                     it->second.get<float>("speeds.va"),
+                                     std::max(it->second.get<float>("kick"), it->second.get<float>("chip")),
+                                     it->second.get<float>("chip") > 0,
+                                     it->second.get<float>("dribble") > 0
+                                 )
+                             );
+                         }
+                     }
+                 }
+             }
+         }
+         catch (std::exception& e) 
+         {
+            for (auto action : actions_blue)
+            {
+                auto r_id = action.get()->r.id;
+                auto r_it = std::find_if(team_blue.begin(), team_blue.end(), [&r_id](const robot& r) { return r.id == r_id; });
+                if (r_it != team_blue.end())
+                {
+                    auto r = *r_it;
+                    action->update_robot(r);
+                }
+            }
+            //std::cout << actions_blue.size() << std::endl;
+             
+         }
     }
 }
+

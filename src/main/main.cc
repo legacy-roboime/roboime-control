@@ -20,9 +20,6 @@ int main(void)
 
         zmq_worker worker(conf, 
             [&w] (boost::property_tree::ptree pt) { 
-                std::stringstream st;
-                boost::property_tree::json_parser::write_json(st, pt);
-                std::cout << st.str() << std::endl;
                 w.update(pt);
             }
         );
@@ -31,11 +28,15 @@ int main(void)
         usb_worker tx(conf);
 
         std::cout << "RoboIME control module!" << std::endl;
-        std::vector<char> buffer = { 0, 0, 0, 0, 0, 1, 2, 3, 4, 5 };
+        
         while (1)
         {
-            tx.send_raw_data(buffer.data(), buffer.size());
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            //boost::shared_lock<boost::shared_mutex> lock(w.access_lock);
+            if (conf.get<bool>("control_blue"))
+                tx.async_process_action(w.actions_blue);
+            if (conf.get<bool>("control_yellow"))
+                tx.async_process_action(w.actions_yellow);
+            //std::this_thread::sleep_for(std::chrono::milliseconds(0));
         }
         getchar(); 
     }

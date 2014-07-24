@@ -83,18 +83,24 @@ if(Boost_FOUND)
 
     set(Model_SOURCES
         ${src}/${model}/world.cc
+        ${src}/${model}/action.cc
+        ${src}/${model}/robot.cc
     )
 
     set(Model_HEADERS 
         ${src}/${model}/world.h
+        ${src}/${model}/action.h
+        ${src}/${model}/robot.h
     )
 
     set(Util_SOURCES
         ${src}/${util}/config.cc
+        ${src}/${util}/pid_controller.cc
     )
 
     set(Util_HEADERS 
         ${src}/${util}/config.h
+        ${src}/${util}/pid_controller.h
     )
 
     add_library(${comm} ${Comm_SOURCES} ${Comm_HEADERS}) 
