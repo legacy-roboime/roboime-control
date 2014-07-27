@@ -1,10 +1,10 @@
 build/
 bin/
 lib/
+
 *.swp
 *.swo
 *.swn
-*.orig
 # Compiled Object files
 *.slo
 *.lo
