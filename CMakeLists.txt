@@ -1,16 +1,20 @@
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.10)
 
-# Custom CMake directives
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
+project(roboime-control)
+
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+include(${PROJECT_SOURCE_DIR}/cmake/Utils.cmake)
+
+#standard_config()
+standard_paths(${PROJECT_SOURCE_DIR} bin lib)
+#message(STATUS "Project src dir: ${PROJECT_SOURCE_DIR}")
 
 set(exec main)
-set(core core)
 set(comm communication)
 set(model model)
 set(util util)
 
 project(${exec} C CXX)
-project(${core} C CXX)
 project(${comm} C CXX)
 project(${model} C CXX)
 project(${util} C CXX)
@@ -25,95 +29,87 @@ else()
 endif()
 
 set(src src)
-set(BOOST_ROOT "" CACHE PATH "Boost path") 
-set(Boost_USE_MULTITHREADED ON)  
-set(Boost_USE_STATIC_RUNTIME OFF) 
+set(BOOST_ROOT "" CACHE PATH "Boost path")
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
 if (WIN32)
-    set(Boost_USE_STATIC_LIBS ON) 
+    set(Boost_USE_STATIC_LIBS ON)
 else()
     set(Boost_USE_STATIC_LIBS OFF)
 endif()
 
-set(Zmq_INCLUDE_DIRS "" CACHE PATH "ZeroMQ 3 include directories")
-set(Zmq_LIBRARY_RELEASE "" CACHE FILEPATH "ZeroMQ 3 library")
-set(Zmq_LIBRARY_DEBUG "" CACHE FILEPATH "ZeroMQ 3 library")
-set(Zmq_LIBRARY optimized ${Zmq_LIBRARY_RELEASE} debug ${Zmq_LIBRARY_DEBUG})
 
-set(Usb_INCLUDE_DIRS "" CACHE PATH "libusb include directories")
-set(Usb_LIBRARY_RELEASE "" CACHE FILEPATH "libusb library")
-set(Usb_LIBRARY_DEBUG "" CACHE FILEPATH "libusb library")
-set(Usb_LIBRARY optimized ${Usb_LIBRARY_RELEASE} debug ${Usb_LIBRARY_DEBUG})
+find_path(CPPZMQ_INCLUDE_DIRS
+    NAMES
+    zmq.hpp
+    PATHS
+    /usr/include
+    /usr/local/include
+    /opt/local/include
+    /sw/include
+)
 
-find_package(Boost 1.47.0 COMPONENTS date_time filesystem system thread regex) 
+find_package(ZMQ REQUIRED)
+find_package(LibUSB REQUIRED)
+find_package(Boost 1.47.0 COMPONENTS date_time filesystem system thread regex REQUIRED)
 
-if(Boost_FOUND)
-    include_directories(
-        ${Boost_INCLUDE_DIRS} 
-        ${Zmq_INCLUDE_DIRS} 
-        ${Usb_INCLUDE_DIRS} 
-        "${src}/${util}" 
-        "${src}/${exec}" 
-        "${src}/${comm}" 
-        "${src}/${model}" 
-        "${src}/${core}" 
-    ) 
+include_directories(
+    ${Boost_INCLUDE_DIRS}
+    ${LibUSB_INCLUDE_DIRS}
+    ${ZMQ_INCLUDE_DIRS}
+    ${CPPZMQ_INCLUDE_DIRS}
+    "${src}/${util}"
+    "${src}/${exec}"
+    "${src}/${comm}"
+    "${src}/${model}"
+)
 
-    set(Exec_SOURCES 
-        ${src}/${exec}/main.cc
-    )
-    set(Exec_HEADERS 
-    )
+set(Exec_SOURCES
+    ${src}/${exec}/main.cc
+)
+set(Exec_HEADERS
+)
 
-    set(Core_SOURCES
-    )
+set(Comm_SOURCES
+    ${src}/${comm}/zmq_worker.h
+    ${src}/${comm}/usb_worker.h
+)
 
-    set(Core_HEADERS 
-        ${src}/${core}/core_worker.h
-    )
+set(Comm_HEADERS
+    ${src}/${comm}/zmq_worker.cc
+    ${src}/${comm}/usb_worker.cc
+)
 
-    set(Comm_SOURCES
-        ${src}/${comm}/zmq_worker.h
-        ${src}/${comm}/usb_worker.h
-    )
+set(Model_SOURCES
+    ${src}/${model}/world.cc
+    ${src}/${model}/action.cc
+    ${src}/${model}/robot.cc
+)
 
-    set(Comm_HEADERS 
-        ${src}/${comm}/zmq_worker.cc
-        ${src}/${comm}/usb_worker.cc
-    )
+set(Model_HEADERS
+    ${src}/${model}/world.h
+    ${src}/${model}/action.h
+    ${src}/${model}/robot.h
+)
 
-    set(Model_SOURCES
-        ${src}/${model}/world.cc
-        ${src}/${model}/action.cc
-        ${src}/${model}/robot.cc
-    )
+set(Util_SOURCES
+    ${src}/${util}/config.cc
+    ${src}/${util}/pid_controller.cc
+)
 
-    set(Model_HEADERS 
-        ${src}/${model}/world.h
-        ${src}/${model}/action.h
-        ${src}/${model}/robot.h
-    )
+set(Util_HEADERS
+    ${src}/${util}/config.h
+    ${src}/${util}/pid_controller.h
+)
 
-    set(Util_SOURCES
-        ${src}/${util}/config.cc
-        ${src}/${util}/pid_controller.cc
-    )
+add_library(${comm} ${Comm_SOURCES} ${Comm_HEADERS})
+add_library(${model} ${Model_SOURCES} ${Model_HEADERS})
+add_library(${util} ${Util_SOURCES} ${Util_HEADERS})
+add_executable(${exec} ${Exec_SOURCES} ${Exec_HEADERS})
 
-    set(Util_HEADERS 
-        ${src}/${util}/config.h
-        ${src}/${util}/pid_controller.h
-    )
+target_link_libraries(${model} ${util} ${Boost_LIBRARIES} ${LibUSB_LIBRARIES})
+target_link_libraries(${comm} ${util} ${model} ${Boost_LIBRARIES} ${ZMQ_LIBRARY}  ${LibUSB_LIBRARIES})
+target_link_libraries(${util} ${Boost_LIBRARIES} ${LibUSB_LIBRARIES})
+target_link_libraries(${exec} ${comm} ${model} ${util} ${Boost_LIBRARIES} ${ZMQ_LIBRARY} ${LibUSB_LIBRARIES})
 
-    add_library(${comm} ${Comm_SOURCES} ${Comm_HEADERS}) 
-    add_library(${model} ${Model_SOURCES} ${Model_HEADERS}) 
-    add_library(${core} ${Core_SOURCES} ${Core_HEADERS}) 
-    add_library(${util} ${Util_SOURCES} ${Util_HEADERS}) 
-    add_executable(${exec} ${Exec_SOURCES} ${Exec_HEADERS}) 
-
-    target_link_libraries(${model} ${util} ${Boost_LIBRARIES} ${Usb_LIBRARY})
-    target_link_libraries(${comm} ${util} ${model} ${Boost_LIBRARIES} ${Zmq_LIBRARY}  ${Usb_LIBRARY})
-    target_link_libraries(${util} ${Boost_LIBRARIES} ${Usb_LIBRARY})
-    target_link_libraries(${core} ${comm} ${model} ${util} ${Boost_LIBRARIES} ${Zmq_LIBRARY} ${Usb_LIBRARY})
-    target_link_libraries(${exec} ${core} ${comm} ${model} ${util} ${Boost_LIBRARIES} ${Zmq_LIBRARY} ${Usb_LIBRARY})
-else()
-    message( SEND_ERROR "Boost is required!" )
-endif()
+# vim: et sw=4 ts=4 sts=4
