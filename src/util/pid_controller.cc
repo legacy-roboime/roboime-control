@@ -9,7 +9,8 @@ namespace roboime
         ki(ki),
         kd(kd),
         max_output(max_output),
-        max_integ(max_integ)
+        max_integ(max_integ),
+        radians(radians)
     {}
 
     void
@@ -18,8 +19,8 @@ namespace roboime
         auto error = input - feedback;
         if (radians)
         {
-            while (error < -M_PI) Controlador->erro += 2 * M_PI;
-            while (error >  M_PI) Controlador->erro -= 2 * M_PI;
+            while (error < -M_PI) error += 2 * M_PI;
+            while (error >  M_PI) error -= 2 * M_PI;
         }
         int_err += error;
         if (ki > 0)

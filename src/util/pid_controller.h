@@ -18,12 +18,14 @@ namespace roboime
             float max_integ;    // integral wind-up limit
             float max_output;   // motor output clamp (limit)
             // input and output
+            bool radians;
+
         public:
             float output;       // motor output
             float input;        // user input
             float feedback;     // motor feedback
 
-            pid_controller(float kp, float ki, float kd, float max_output, float max_integ);
+            pid_controller(float kp, float ki, float kd, float max_output, float max_integ, bool radians=false);
             void step(void);
     };
 }
