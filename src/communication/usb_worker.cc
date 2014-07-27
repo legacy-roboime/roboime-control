@@ -13,7 +13,12 @@ namespace roboime
         libusb_init(&context);
         // 5824/1500
         handle = libusb_open_device_with_vid_pid(context, 0x16c0, 0x05dc);
-        std::cout << "Acquired transmitter USB handle." << std::endl;
+        if (handle) {
+            std::cout << "Acquired transmitter USB handle." << std::endl;
+        } else {
+            std::cerr << "Could not find USB transmitter." << std::endl;
+            throw std::runtime_error("Could not find USB transmitter.");
+        }
     }
 
     usb_worker::~usb_worker()
@@ -52,3 +57,5 @@ namespace roboime
         libusb_control_transfer(handle, 0x40, 3, 0, 0, command, size, timeout);
     }
 }
+
+// vim: et sw=4 ts=4 sts=4
