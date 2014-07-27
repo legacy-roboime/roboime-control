@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 2.8)
 
 # Custom CMake directives
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 
 set(exec main)
 set(core core)

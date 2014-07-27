@@ -4,7 +4,7 @@
 
 namespace roboime
 {
-    pid_controller::pid_controller(float kp, float ki, float kd, float max_output, float max_integ) :
+    pid_controller::pid_controller(float kp, float ki, float kd, float max_output, float max_integ, bool radians) :
         kp(kp),
         ki(ki),
         kd(kd),
@@ -16,6 +16,11 @@ namespace roboime
     pid_controller::step(void)
     {
         auto error = input - feedback;
+        if (radians)
+        {
+            while (error < -M_PI) Controlador->erro += 2 * M_PI;
+            while (error >  M_PI) Controlador->erro -= 2 * M_PI;
+        }
         int_err += error;
         if (ki > 0)
         {
@@ -28,4 +33,3 @@ namespace roboime
         output = std::fmin(std::fmax(output, -max_output), max_output);
     }
 }
-

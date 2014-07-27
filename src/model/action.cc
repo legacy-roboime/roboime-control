@@ -13,7 +13,7 @@ namespace roboime
         dribble(dribble)
     {}
 
-    char 
+    char
     move_action::to_byte(float x)
     {
         if (abs(x) > r.max_speed)
@@ -24,7 +24,7 @@ namespace roboime
         return (char) (127 * x);
     }
 
-    char 
+    char
     move_action::to_byte_kick(float x)
     {
         if (abs(x) > r.max_speed)
@@ -51,10 +51,10 @@ namespace roboime
                 *it = *it * r.max_speed / largest;
 
         return std::vector<char> {
-            (char) r.id, 
-            to_byte(-speeds[0]), 
-            to_byte(-speeds[1]), 
-            to_byte(-speeds[2]), 
+            (char) r.id,
+            to_byte(-speeds[0]),
+            to_byte(-speeds[1]),
+            to_byte(-speeds[2]),
             to_byte(-speeds[3]),
             to_byte(dribble? 255 : 0),
             to_byte(is_chip? to_byte_kick(kick) : to_byte_kick(-kick))
@@ -83,7 +83,7 @@ namespace roboime
         {
             move_action a(r,
                 dist_controller.output * delta.x / delta.norm(),
-                dist_controller.output * delta.y / delta.norm(), 
+                dist_controller.output * delta.y / delta.norm(),
                 angle_controller.output
             );
             return a.as_buffer();
@@ -92,7 +92,7 @@ namespace roboime
         {
             move_action a(r,
                 0,
-                0, 
+                0,
                 angle_controller.output
             );
             return a.as_buffer();

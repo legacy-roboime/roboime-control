@@ -1,0 +1,6 @@
+{
+    "zmq_subscriber_addr)": "tcp://192.168.0.82:6665",
+    "zmq_subscriber_addr": "tcp://localhost:6665",
+    "control_blue": false,
+    "control_yellow": true 
+}

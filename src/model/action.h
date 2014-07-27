@@ -5,7 +5,6 @@
 #include "robot.h"
 #include "pid_controller.h"
 
-
 namespace roboime
 {
     class action
@@ -33,12 +32,12 @@ namespace roboime
             char to_byte_kick(float);
 
         public:
-            move_action(robot r, 
-                    float vx, 
-                    float vy, 
-                    float va, 
-                    float kick=0, 
-                    bool is_chip=false, 
+            move_action(robot r,
+                    float vx,
+                    float vy,
+                    float va,
+                    float kick=0,
+                    bool is_chip=false,
                     bool dribble=false);
 
             virtual std::vector<char> as_buffer();
