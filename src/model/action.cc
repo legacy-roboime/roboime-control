@@ -16,8 +16,8 @@ namespace roboime
     char
     move_action::to_byte(float x)
     {
-        if (abs(x) > r.max_speed)
-            x = x / abs(x);
+        if (std::abs(x) > r.max_speed)
+            x = x /std::abs(x);
         else
             x = x / r.max_speed;
 
@@ -27,7 +27,7 @@ namespace roboime
     char
     move_action::to_byte_kick(float x)
     {
-        if (abs(x) > r.max_speed)
+        if (std::abs(x) > r.max_speed)
             x = 1;
         return (char) (127 * x);
     }
@@ -45,7 +45,7 @@ namespace roboime
             (vy * cosf(robot::angles[2]) - vx * sinf(robot::angles[2]) + va * r.radius) / r.wheel_radius,
             (vy * cosf(robot::angles[3]) - vx * sinf(robot::angles[3]) + va * r.radius) / r.wheel_radius
         };
-        auto largest = *std::max_element(speeds.begin(), speeds.end(), [](float x, float y) { return std::abs(x) < std::abs(y); });
+        auto largest = *std::max_element(speeds.begin(), speeds.end(), [](float x, float y) { return std::fabs(x) < std::fabs(y); });
         if (largest > r.max_speed && largest != 0)
             for (auto it = speeds.begin(), end_it = speeds.end(); it < end_it; ++it)
                 *it = *it * r.max_speed / largest;

@@ -28,7 +28,7 @@ int main(void)
         usb_worker tx(conf);
 
         std::cout << "RoboIME control module!" << std::endl;
-        
+
         while (1)
         {
             //boost::shared_lock<boost::shared_mutex> lock(w.access_lock);
@@ -38,7 +38,7 @@ int main(void)
                 tx.async_process_action(w.actions_yellow);
             //std::this_thread::sleep_for(std::chrono::milliseconds(0));
         }
-        getchar(); 
+        getchar();
     }
     catch (std::exception& e)
     {
