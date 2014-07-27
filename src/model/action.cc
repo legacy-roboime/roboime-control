@@ -16,8 +16,8 @@ namespace roboime
     char 
     move_action::to_byte(float x)
     {
-        if (abs(x) > r.max_speed)
-            x = x / abs(x);
+        if (std::abs(x) > r.max_speed)
+            x = x / std::abs(x);
         else
             x = x / r.max_speed;
 
@@ -27,7 +27,7 @@ namespace roboime
     char 
     move_action::to_byte_kick(float x)
     {
-        if (abs(x) > r.max_speed)
+        if (std::abs(x) > r.max_speed)
             x = 1;
         return (char) (127 * x);
     }

@@ -8,6 +8,9 @@
 #include "world.h"
 #include "config.h"
 
+struct libusb_context;
+struct libusb_device_handle;
+
 namespace roboime
 {
     class packet
@@ -21,12 +24,8 @@ namespace roboime
         private:
             const config& conf;
 
-            boost::asio::io_service service;
-            boost::asio::io_service::work work;
-            boost::thread worker;
-
-            void* handle;
-            void* get_device(uint16_t vendor, uint16_t product);
+            libusb_context* context;
+            libusb_device_handle* handle;
 
             void receive_loop(void);
 
@@ -35,7 +34,9 @@ namespace roboime
             ~usb_worker();
 
             void async_process_action(const std::vector<std::shared_ptr<action>>& command);
-            void send_raw_data(char* command, size_t count);
+            void send_raw_data(unsigned char* command, size_t count);
     };
 }
 #endif
+
+// vim: et sw=4 ts=4 sts=4
