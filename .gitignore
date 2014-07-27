@@ -1,4 +1,6 @@
 build/
+bin/
+lib/
 *.swp
 *.swo
 *.swn
