@@ -1,15 +1,6 @@
 cmake_minimum_required(VERSION 2.8.10)
 
-project(roboime-control)
-
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
-include(${PROJECT_SOURCE_DIR}/cmake/Utils.cmake)
-
-#standard_config()
-standard_paths(${PROJECT_SOURCE_DIR} bin lib)
-#message(STATUS "Project src dir: ${PROJECT_SOURCE_DIR}")
-
-set(exec roboime-control)
+set(exec main)
 set(comm communication)
 set(model model)
 set(util util)
@@ -18,6 +9,13 @@ project(${exec} C CXX)
 project(${comm} C CXX)
 project(${model} C CXX)
 project(${util} C CXX)
+project(roboime-control)
+
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+include(${PROJECT_SOURCE_DIR}/cmake/Utils.cmake)
+
+standard_paths(${PROJECT_SOURCE_DIR} bin lib)
+#message(STATUS "Project src dir: ${PROJECT_SOURCE_DIR}")
 
 if(WIN32)
     # Define minimum Windows version for headers 0x501 = Vista IIRC
@@ -105,11 +103,11 @@ set(Util_HEADERS
 add_library(${comm} ${Comm_SOURCES} ${Comm_HEADERS})
 add_library(${model} ${Model_SOURCES} ${Model_HEADERS})
 add_library(${util} ${Util_SOURCES} ${Util_HEADERS})
-add_executable(${exec} ${Exec_SOURCES} ${Exec_HEADERS})
+add_executable(${CMAKE_PROJECT_NAME} ${Exec_SOURCES} ${Exec_HEADERS})
 
 target_link_libraries(${model} ${util} ${Boost_LIBRARIES} ${LibUSB_LIBRARIES})
 target_link_libraries(${comm} ${util} ${model} ${Boost_LIBRARIES} ${ZMQ_LIBRARY}  ${LibUSB_LIBRARIES})
 target_link_libraries(${util} ${Boost_LIBRARIES} ${LibUSB_LIBRARIES})
-target_link_libraries(${exec} ${comm} ${model} ${util} ${Boost_LIBRARIES} ${ZMQ_LIBRARY} ${LibUSB_LIBRARIES})
+target_link_libraries(${CMAKE_PROJECT_NAME} ${comm} ${model} ${util} ${Boost_LIBRARIES} ${ZMQ_LIBRARY} ${LibUSB_LIBRARIES})
 
 # vim: et sw=4 ts=4 sts=4
