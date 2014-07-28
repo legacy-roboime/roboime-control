@@ -3,6 +3,7 @@
 
 #include <cmath>
 
+
 namespace roboime
 {
     struct point
@@ -29,8 +30,11 @@ namespace roboime
         float wheel_radius;
         float max_speed;
 
+#ifndef _MSC_VER
         static constexpr float angles[4]{60. * M_PI / 180., 135. * M_PI / 180., -135. * M_PI / 180., -60. * M_PI / 180.};
-
+#else
+        static const float angles[4];
+#endif
         robot(int id, float x, float y, float o);
     };
 }

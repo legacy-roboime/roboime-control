@@ -1,6 +1,12 @@
 #include "pid_controller.h"
 
 #include <cmath>
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+#include <algorithm>
+
+
 
 namespace roboime
 {
@@ -25,12 +31,12 @@ namespace roboime
         int_err += error;
         if (ki > 0)
         {
-            int_err = std::fmin(std::fmax(int_err, -std::abs(max_integ) / ki), std::abs(max_integ) / ki);
+            int_err = std::min(std::max(int_err, -std::abs(max_integ) / ki), std::abs(max_integ) / ki);
         }
         diff_err = error - prev_err;
         prev_err = error;
 
         output = kp * error + ki * int_err + kd * diff_err;
-        output = std::fmin(std::fmax(output, -max_output), max_output);
+        output = std::min(std::max(output, -max_output), max_output);
     }
 }

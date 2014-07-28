@@ -4,7 +4,11 @@
 
 namespace roboime
 {
+#ifndef _MSC_VER
     constexpr float robot::angles[4];
+#else
+    float robot::angles[4] = {60. * M_PI / 180., 135. * M_PI / 180., -135. * M_PI / 180., -60. * M_PI / 180.}
+#endif
 
     point::point() :
         x(0), y(0)
