@@ -37,6 +37,9 @@ else()
 endif()
 
 
+
+find_package(ZMQ REQUIRED)
+
 find_path(CPPZMQ_INCLUDE_DIRS
     NAMES
     zmq.hpp
@@ -45,9 +48,9 @@ find_path(CPPZMQ_INCLUDE_DIRS
     /usr/local/include
     /opt/local/include
     /sw/include
+    ${ZMQ_INCLUDE_DIRS}
 )
 
-find_package(ZMQ REQUIRED)
 find_package(LibUSB REQUIRED)
 find_package(Boost 1.47.0 COMPONENTS date_time filesystem system thread regex REQUIRED)
 
