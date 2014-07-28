@@ -6,19 +6,20 @@ namespace roboime
 {
     zmq_worker::zmq_worker(
             const config& conf,
-            std::function<void(boost::property_tree::ptree /* json_string */)> process_incoming) :
+            std::function<void(boost::property_tree::ptree /* json */)> process_incoming) :
         conf(conf),
         ctx(1),
         recv_sock(ctx, ZMQ_SUB),
-        process_incoming(process_incoming)
+        process_incoming(process_incoming),
+        requested_termination(false)
     {
         worker = boost::thread(&zmq_worker::receive_loop, this);
     }
 
     zmq_worker::~zmq_worker()
     {
-        if (recv_sock.connected())
-            recv_sock.close();
+        recv_sock.close();
+        ctx.reset();
         worker.join();
     }
 
@@ -35,8 +36,9 @@ namespace roboime
         catch (std::exception& e)
         {
             ERROR(e);
+            return;
         }
-        for (;;)
+        while (!requested_termination)
         {
             try
             {
@@ -65,7 +67,7 @@ namespace roboime
                 // Close the socket, rebind and hope it goes away (while logging).
                 recv_sock.close();
                 recv_sock.connect(conf.get<std::string>("zmq_subscriber_addr").c_str());
-                std::cout << __FUNCTION__ << " [ERROR] " << e.what() << std::endl;
+                ERROR(e);
             }
         }
     }
