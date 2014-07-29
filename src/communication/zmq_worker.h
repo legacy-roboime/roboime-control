@@ -14,7 +14,7 @@ namespace roboime
             const config& conf;
             std::function<void(boost::property_tree::ptree /* json_string */)> process_incoming;
             boost::thread worker;
-            zmq::context_t ctx;
+            std::shared_ptr<zmq::context_t> ctx;
             zmq::socket_t recv_sock;
             bool requested_termination;
 

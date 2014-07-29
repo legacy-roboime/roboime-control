@@ -18,8 +18,8 @@ int main(void)
         config conf;
         world w;
 
-        zmq_worker worker(conf, 
-            [&w] (boost::property_tree::ptree pt) { 
+        zmq_worker worker(conf,
+            [&w] (boost::property_tree::ptree pt) {
                 w.update(pt);
             }
         );
@@ -29,6 +29,8 @@ int main(void)
 
         std::cout << "RoboIME control module!" << std::endl;
 
+        const int send_sleep = conf.get<int>("send_sleep");
+
         while (1)
         {
             //boost::shared_lock<boost::shared_mutex> lock(w.access_lock);
@@ -36,7 +38,7 @@ int main(void)
                 tx.async_process_action(w.actions_blue);
             if (conf.get<bool>("control_yellow"))
                 tx.async_process_action(w.actions_yellow);
-            //std::this_thread::sleep_for(std::chrono::milliseconds(0));
+            std::this_thread::sleep_for(std::chrono::milliseconds(send_sleep));
         }
         getchar();
     }

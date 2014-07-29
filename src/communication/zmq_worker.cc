@@ -8,8 +8,8 @@ namespace roboime
             const config& conf,
             std::function<void(boost::property_tree::ptree /* json */)> process_incoming) :
         conf(conf),
-        ctx(1),
-        recv_sock(ctx, ZMQ_SUB),
+        ctx(std::make_shared<zmq::context_t>(1)),
+        recv_sock(*ctx, ZMQ_SUB),
         process_incoming(process_incoming),
         requested_termination(false)
     {
