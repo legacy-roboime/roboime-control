@@ -18,6 +18,9 @@ namespace roboime
 
     zmq_worker::~zmq_worker()
     {
+        requested_termination = true;
+        if (recv_sock.connected())
+            recv_sock.disconnect(conf.get<std::string>("zmq_subscriber_addr").c_str());
         recv_sock.close();
         ctx.reset();
         worker.join();
@@ -43,9 +46,7 @@ namespace roboime
             try
             {
                 zmq::message_t message;
-
                 recv_sock.recv(&message);
-
                 try
                 {
                     std::string raw_json(static_cast<char*>(message.data()), message.size());
@@ -56,17 +57,14 @@ namespace roboime
                     boost::property_tree::json_parser::read_json(st, pt);
                     process_incoming(pt);
                 }
-                catch (std::exception& e) 
-                { 
-                    ERROR(e);    
+                catch (std::exception& e)
+                {
+                    ERROR(e);
                 }
             }
             catch (std::exception& e)
             {
-                // I have no frickin idea how to recover from ZMQ errors. 
-                // Close the socket, rebind and hope it goes away (while logging).
-                recv_sock.close();
-                recv_sock.connect(conf.get<std::string>("zmq_subscriber_addr").c_str());
+                // I have no frickin idea how to recover from ZMQ errors.
                 ERROR(e);
             }
         }

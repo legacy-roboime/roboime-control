@@ -30,26 +30,3 @@ macro(standard_paths ARG0 ARG1 ARG2)
     set(CMAKE_DEBUG_POSTFIX d)
     set(CMAKE_MINSIZEREL_POSTFIX min)
 endmacro()
-
-macro(standard_config)
-    set(CMAKE_AUTOMOC YES)
-    set(CMAKE_INCLUDE_CURRENT_DIR YES)
-    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-    set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMakeTargets")
-    set_property(GLOBAL PROPERTY FOLDER generated)
-
-    if(MSVC)
-        add_definitions(-DHAVE_WINDOWS)
-    endif()
-
-    if(UNIX)
-        add_definitions(-DHAVE_UNIX)
-        if(APPLE)
-            add_definitions(-DHAVE_MACOSX)
-        else()
-            #TODO: fix this, say we have FreeBSD, that's not linux
-            add_definitions(-DHAVE_LINUX)
-        endif()
-    endif()
-
-endmacro()
