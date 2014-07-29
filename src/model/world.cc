@@ -4,6 +4,8 @@
 #include <algorithm>
 
 #include "world.h"
+#include "move_action.h"
+#include "goto_action.h"
 #include "config.h"
 
 namespace roboime

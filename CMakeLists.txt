@@ -31,12 +31,11 @@ set(BOOST_ROOT "" CACHE PATH "Boost path")
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 if (WIN32)
+    # Avoids needing to distribute the boost dlls
     set(Boost_USE_STATIC_LIBS ON)
 else()
     set(Boost_USE_STATIC_LIBS OFF)
 endif()
-
-
 
 find_package(ZMQ REQUIRED)
 
@@ -83,13 +82,16 @@ set(Comm_HEADERS
 
 set(Model_SOURCES
     ${src}/${model}/world.cc
-    ${src}/${model}/action.cc
+    ${src}/${model}/move_action.cc
+    ${src}/${model}/goto_action.cc
     ${src}/${model}/robot.cc
 )
 
 set(Model_HEADERS
     ${src}/${model}/world.h
     ${src}/${model}/action.h
+    ${src}/${model}/move_action.h
+    ${src}/${model}/goto_action.h
     ${src}/${model}/robot.h
 )
 
