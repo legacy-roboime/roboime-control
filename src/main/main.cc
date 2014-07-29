@@ -44,6 +44,6 @@ int main(void)
     }
     catch (std::exception& e)
     {
-        std::cerr << __FUNCTION__ << " [ERROR] " << e.what() << std::endl;
+        ERROR(e);
     }
 }
