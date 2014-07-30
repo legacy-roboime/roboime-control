@@ -50,6 +50,7 @@ find_path(CPPZMQ_INCLUDE_DIRS
     ${ZMQ_INCLUDE_DIRS}
 )
 
+find_package(Protobuf REQUIRED)
 find_package(LibUSB REQUIRED)
 find_package(Boost 1.47.0 COMPONENTS date_time filesystem system thread regex REQUIRED)
 
@@ -73,17 +74,20 @@ set(Exec_HEADERS
 set(Comm_SOURCES
     ${src}/${comm}/zmq_worker.h
     ${src}/${comm}/usb_worker.h
+    ${src}/${comm}/multicast_worker.h
 )
 
 set(Comm_HEADERS
     ${src}/${comm}/zmq_worker.cc
     ${src}/${comm}/usb_worker.cc
+    ${src}/${comm}/multicast_worker.cc
 )
 
 set(Model_SOURCES
     ${src}/${model}/world.cc
     ${src}/${model}/move_action.cc
     ${src}/${model}/goto_action.cc
+    ${src}/${model}/kickto_action.cc
     ${src}/${model}/robot.cc
 )
 
@@ -92,6 +96,7 @@ set(Model_HEADERS
     ${src}/${model}/action.h
     ${src}/${model}/move_action.h
     ${src}/${model}/goto_action.h
+    ${src}/${model}/kickto_action.h
     ${src}/${model}/robot.h
 )
 

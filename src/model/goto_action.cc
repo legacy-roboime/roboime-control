@@ -1,4 +1,5 @@
 #include <goto_action.h>
+#include <iostream>
 
 namespace roboime
 {
@@ -7,7 +8,7 @@ namespace roboime
         position(x, y),
         angle(o),
         dist_controller(.1, .01, .5, 50., 1.2),
-        angle_controller(1., 0., 0., .5, 360)
+        angle_controller(1., 0., 0., .5, 360, true)
     {}
 
     std::vector<char>

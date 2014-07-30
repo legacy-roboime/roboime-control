@@ -4,7 +4,13 @@
 
 namespace roboime
 {
-    move_action::move_action(robot r, float vx, float vy, float va, float kick, bool is_chip, bool dribble) :
+    move_action::move_action(robot r,
+            float vx,
+            float vy,
+            float va,
+            float kick,
+            bool is_chip,
+            bool dribble) :
         action(r),
         vx(vx),
         vy(vy),
@@ -45,7 +51,12 @@ namespace roboime
             (vy * cosf(robot::angles[2]) - vx * sinf(robot::angles[2]) + va * r.radius) / r.wheel_radius,
             (vy * cosf(robot::angles[3]) - vx * sinf(robot::angles[3]) + va * r.radius) / r.wheel_radius
         };
-        auto largest = *std::max_element(speeds.begin(), speeds.end(), [](float x, float y) { return std::fabs(x) < std::fabs(y); });
+        auto largest = *std::max_element(speeds.begin(),
+            speeds.end(),
+            [](float x, float y) {
+                return std::fabs(x) < std::fabs(y);
+            }
+        );
         if (largest > r.max_speed && largest != 0)
             for (auto it = speeds.begin(), end_it = speeds.end(); it < end_it; ++it)
                 *it = *it * r.max_speed / largest;

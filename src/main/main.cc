@@ -20,6 +20,9 @@ int main(void)
 
         zmq_worker worker(conf,
             [&w] (boost::property_tree::ptree pt) {
+                //std::stringstream ss;
+                //boost::property_tree::json_parser::write_json(ss, pt);
+                //std::cout << ss.str() << std::endl;
                 w.update(pt);
             }
         );
