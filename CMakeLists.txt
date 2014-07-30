@@ -50,7 +50,7 @@ find_path(CPPZMQ_INCLUDE_DIRS
     ${ZMQ_INCLUDE_DIRS}
 )
 
-find_package(Protobuf REQUIRED)
+# find_package(Protobuf REQUIRED)
 find_package(LibUSB REQUIRED)
 find_package(Boost 1.47.0 COMPONENTS date_time filesystem system thread regex REQUIRED)
 
