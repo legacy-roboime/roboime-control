@@ -5,10 +5,6 @@ set(comm communication)
 set(model model)
 set(util util)
 
-project(${exec} C CXX)
-project(${comm} C CXX)
-project(${model} C CXX)
-project(${util} C CXX)
 project(roboime-control)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
@@ -59,58 +55,29 @@ include_directories(
     ${LibUSB_INCLUDE_DIRS}
     ${ZMQ_INCLUDE_DIRS}
     ${CPPZMQ_INCLUDE_DIRS}
-    "${src}/${util}"
-    "${src}/${exec}"
-    "${src}/${comm}"
-    "${src}/${model}"
+    ${src}
 )
 
-set(Exec_SOURCES
-    ${src}/${exec}/main.cc
-)
-set(Exec_HEADERS
-)
-
-set(Comm_SOURCES
-    ${src}/${comm}/zmq_worker.h
-    ${src}/${comm}/usb_worker.h
-)
-
-set(Comm_HEADERS
-    ${src}/${comm}/zmq_worker.cc
-    ${src}/${comm}/usb_worker.cc
-)
-
-set(Model_SOURCES
-    ${src}/${model}/world.cc
-    ${src}/${model}/action.cc
-    ${src}/${model}/robot.cc
+set(SOURCES
+    ${src}/main.cc
+    ${src}/zmq_worker.h
+    ${src}/usb_worker.h
+    ${src}/zmq_worker.cc
+    ${src}/usb_worker.cc
+    ${src}/world.cc
+    ${src}/action.cc
+    ${src}/robot.cc
+    ${src}/world.h
+    ${src}/action.h
+    ${src}/robot.h
+    ${src}/config.cc
+    ${src}/pid_controller.cc
+    ${src}/config.h
+    ${src}/pid_controller.h
 )
 
-set(Model_HEADERS
-    ${src}/${model}/world.h
-    ${src}/${model}/action.h
-    ${src}/${model}/robot.h
-)
-
-set(Util_SOURCES
-    ${src}/${util}/config.cc
-    ${src}/${util}/pid_controller.cc
-)
-
-set(Util_HEADERS
-    ${src}/${util}/config.h
-    ${src}/${util}/pid_controller.h
-)
-
-add_library(${comm} ${Comm_SOURCES} ${Comm_HEADERS})
-add_library(${model} ${Model_SOURCES} ${Model_HEADERS})
-add_library(${util} ${Util_SOURCES} ${Util_HEADERS})
-add_executable(${CMAKE_PROJECT_NAME} ${Exec_SOURCES} ${Exec_HEADERS})
-
-target_link_libraries(${model} ${util} ${Boost_LIBRARIES} ${LibUSB_LIBRARIES})
-target_link_libraries(${comm} ${util} ${model} ${Boost_LIBRARIES} ${ZMQ_LIBRARY}  ${LibUSB_LIBRARIES})
-target_link_libraries(${util} ${Boost_LIBRARIES} ${LibUSB_LIBRARIES})
-target_link_libraries(${CMAKE_PROJECT_NAME} ${comm} ${model} ${util} ${Boost_LIBRARIES} ${ZMQ_LIBRARY} ${LibUSB_LIBRARIES})
+set(app ${CMAKE_PROJECT_NAME})
+add_executable(${app} ${SOURCES} ${HEADERS})
+target_link_libraries(${app} ${Boost_LIBRARIES} ${ZMQ_LIBRARY} ${LibUSB_LIBRARIES})
 
 # vim: et sw=4 ts=4 sts=4
