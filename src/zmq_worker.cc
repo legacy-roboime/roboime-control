@@ -19,10 +19,10 @@ namespace roboime
     zmq_worker::~zmq_worker()
     {
         requested_termination = true;
-        if (recv_sock.connected())
-            recv_sock.disconnect(conf.get<std::string>("zmq_subscriber_addr").c_str());
-        recv_sock.close();
-        ctx.reset();
+        //if (recv_sock.connected())
+        //    recv_sock.disconnect(conf.get<std::string>("zmq_subscriber_addr").c_str());
+        //recv_sock.close();
+        //ctx.reset();
         worker.join();
     }
 

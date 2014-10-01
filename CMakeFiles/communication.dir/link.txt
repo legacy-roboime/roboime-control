@@ -1,0 +1,2 @@
+/usr/bin/ar cr lib/libcommunication.a  CMakeFiles/communication.dir/src/communication/zmq_worker.cc.o CMakeFiles/communication.dir/src/communication/usb_worker.cc.o
+/usr/bin/ranlib lib/libcommunication.a

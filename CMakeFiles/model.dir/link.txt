@@ -1,0 +1,2 @@
+/usr/bin/ar cr lib/libmodel.a  CMakeFiles/model.dir/src/model/world.cc.o CMakeFiles/model.dir/src/model/action.cc.o CMakeFiles/model.dir/src/model/robot.cc.o
+/usr/bin/ranlib lib/libmodel.a

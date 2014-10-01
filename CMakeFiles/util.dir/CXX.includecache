@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/robotica/roboime-control/src/util/config.cc
+config.h
+/home/robotica/roboime-control/src/util/config.h
+fstream
+-
+iostream
+-
+boost/property_tree/json_parser.hpp
+-
+
+/home/robotica/roboime-control/src/util/config.h
+vector
+-
+boost/property_tree/ptree.hpp
+-
+
+/home/robotica/roboime-control/src/util/pid_controller.cc
+pid_controller.h
+/home/robotica/roboime-control/src/util/pid_controller.h
+cmath
+-
+algorithm
+-
+
+/home/robotica/roboime-control/src/util/pid_controller.h
+

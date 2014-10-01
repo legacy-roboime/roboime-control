@@ -1,0 +1,4 @@
+/home/robotica/roboime-control/CMakeFiles/communication.dir
+/home/robotica/roboime-control/CMakeFiles/model.dir
+/home/robotica/roboime-control/CMakeFiles/roboime-control.dir
+/home/robotica/roboime-control/CMakeFiles/util.dir

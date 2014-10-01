@@ -1,0 +1,1 @@
+/usr/bin/c++    -std=c++11    CMakeFiles/roboime-control.dir/src/main/main.cc.o  -o bin/roboime-control -rdynamic lib/libcommunication.a lib/libmodel.a lib/libutil.a -lboost_date_time -lboost_filesystem -lboost_system -lboost_thread -lboost_regex -lpthread -lzmq -lusb-1.0 
