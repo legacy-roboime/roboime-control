@@ -1,7 +1,6 @@
 {
-    "zmq_subscriber_addr)": "tcp://192.168.0.82:6665",
     "zmq_subscriber_addr": "tcp://localhost:6665",
-    "control_blue": false,
-    "control_yellow": true,
-    "send_sleep": 0
+    "control_blue": true,
+    "control_yellow": false,
+    "send_sleep": 10
 }

@@ -13,12 +13,6 @@ struct libusb_device_handle;
 
 namespace roboime
 {
-    class packet
-    {
-        void* buf;
-        size_t len;
-    };
-
     class usb_worker
     {
         private:

@@ -27,12 +27,11 @@ set(BOOST_ROOT "" CACHE PATH "Boost path")
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 if (WIN32)
+    # Avoids needing to distribute the boost dlls
     set(Boost_USE_STATIC_LIBS ON)
 else()
     set(Boost_USE_STATIC_LIBS OFF)
 endif()
-
-
 
 find_package(ZMQ REQUIRED)
 
@@ -47,6 +46,7 @@ find_path(CPPZMQ_INCLUDE_DIRS
     ${ZMQ_INCLUDE_DIRS}
 )
 
+# find_package(Protobuf REQUIRED)
 find_package(LibUSB REQUIRED)
 find_package(Boost 1.47.0 COMPONENTS date_time filesystem system thread regex REQUIRED)
 
@@ -65,15 +65,21 @@ set(SOURCES
     ${src}/zmq_worker.cc
     ${src}/usb_worker.cc
     ${src}/world.cc
-    ${src}/action.cc
+    ${src}/move_action.cc
+    ${src}/goto_action.cc
+    ${src}/kickto_action.cc
+    ${src}/move_action.h
+    ${src}/goto_action.h
+    ${src}/kickto_action.h
     ${src}/robot.cc
     ${src}/world.h
-    ${src}/action.h
     ${src}/robot.h
     ${src}/config.cc
     ${src}/pid_controller.cc
     ${src}/config.h
     ${src}/pid_controller.h
+    ${src}/multicast_worker.h
+    ${src}/multicast_worker.cc
 )
 
 set(app ${CMAKE_PROJECT_NAME})

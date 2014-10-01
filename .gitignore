@@ -26,3 +26,5 @@ lib/
 *.exe
 *.out
 *.app
+
+.clang_complete

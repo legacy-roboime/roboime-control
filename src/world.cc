@@ -4,6 +4,8 @@
 #include <algorithm>
 
 #include "world.h"
+#include "move_action.h"
+#include "goto_action.h"
 #include "config.h"
 
 namespace roboime
@@ -87,12 +89,12 @@ namespace roboime
             //boost::property_tree::json_parser::write_json(std::cout, yellows);
             if (yellows.begin() != yellows.end())
             {
-                actions_yellow.clear();            
+                actions_yellow.clear();
                 for (auto it = yellows.begin(), endIt = yellows.end(); it != endIt; ++it)
                 {
                     auto r_id = it->second.get<int>("uid");
                     auto r_it = std::find_if(team_yellow.begin(), team_yellow.end(), [&r_id](const robot& r) { return r.id == r_id; });
-                    
+
                     if (r_it != team_yellow.end())
                     {
                         auto r = *r_it;
@@ -107,6 +109,17 @@ namespace roboime
                                     std::max(it->second.get<float>("kick"), it->second.get<float>("chip")),
                                     it->second.get<float>("chip") > 0,
                                     it->second.get<float>("dribble") > 0
+                                )
+                            );
+                        }
+                        if (it->second.get<std::string>("type") == "goto")
+                        {
+                            actions_yellow.push_back(
+                                std::make_shared<goto_action>(
+                                    r,
+                                    it->second.get<float>("target.x"),
+                                    it->second.get<float>("target.y"),
+                                    it->second.get<float>("target.angle")
                                 )
                             );
                         }
@@ -129,7 +142,7 @@ namespace roboime
             }
             //std::cout << actions_yellow.size() << std::endl;
         } 
-             
+
          try
          {
              auto blues = packet.get_child("control.actions_blue");
@@ -154,6 +167,17 @@ namespace roboime
                                      std::max(it->second.get<float>("kick"), it->second.get<float>("chip")),
                                      it->second.get<float>("chip") > 0,
                                      it->second.get<float>("dribble") > 0
+                                 )
+                             );
+                         }
+                         if (it->second.get<std::string>("type") == "goto")
+                         {
+                             actions_blue.push_back(
+                                 std::make_shared<goto_action>(
+                                     r,
+                                     it->second.get<float>("target.x"),
+                                     it->second.get<float>("target.y"),
+                                     it->second.get<float>("target.angle")
                                  )
                              );
                          }
